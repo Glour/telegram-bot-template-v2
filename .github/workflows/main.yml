@@ -20,10 +20,10 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Server
-        run: | # TODO change ip
+        run: | # TODO change ip and path
           ssh -o "StrictHostKeyChecking=no" root@ << 'ENDSSH'
-          cd /home/bop-backend
-          docker compose --env-file docker/.env.prod -f docker/prod.yml down
+          cd /home/
+          docker compose down
           git pull
-          docker compose --env-file docker/.env.prod -f docker/prod.yml up --build -d
+          docker compose up --build -d
           ENDSSH

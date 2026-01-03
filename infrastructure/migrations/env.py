@@ -1,3 +1,4 @@
+"""Alembic migration environment."""
 import asyncio
 from logging.config import fileConfig
 
@@ -6,31 +7,26 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from infrastructure.database.models import (
-    Base, User  # noqa: F401, F403
-    # noqa: F401, F403
-    # noqa: F401, F403
-    # noqa: F401, F403
-)
-from settings.app_settings import AppSettings
+from config.settings.base import get_settings
+from infrastructure.database.models.base import Base
 
-settings = AppSettings()
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+# Import all models for autogenerate
+from infrastructure.database.models.analytics import AnalyticsEvent  # noqa: F401
+from infrastructure.database.models.users import User  # noqa: F401
+
+# Alembic Config object
 config = context.config
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
+
+# Interpret the config file for Python logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+# Metadata for 'autogenerate' support
 target_metadata = Base.metadata
 
-db_config = settings.postgres
-
-config.set_main_option(
-    "sqlalchemy.url",
-    db_config.construct_async_sqlalchemy_url,
-)
+# Get database URL from settings
+settings = get_settings()
+config.set_main_option("sqlalchemy.url", settings.database.sync_url)
 
 
 def run_migrations_offline() -> None:
